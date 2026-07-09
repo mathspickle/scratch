@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attrape les étoiles — Tutoriel Scratch</title>
+<meta name="description" content="Tutoriel pas à pas pour créer le jeu Scratch « Attrape les étoiles »">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0b0f2e;
+    --bg-mid:#141a4d;
+    --bg-panel:#1b2260;
+    --star-gold:#ffcb47;
+    --comet-pink:#ff6f9c;
+    --lavender:#b8a6ff;
+    --text:#f4f1ff;
+    --muted:#9ba0c9;
+    --line: rgba(244,241,255,0.12);
+
+    --display: 'Baloo 2', sans-serif;
+    --body: 'Nunito Sans', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(184,166,255,0.10), transparent 55%),
+      radial-gradient(ellipse at 85% 15%, rgba(255,107,156,0.08), transparent 45%),
+      var(--bg-deep);
+    color:var(--text);
+    font-family:var(--body);
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  a{color:var(--star-gold);}
+  a:focus-visible, button:focus-visible, summary:focus-visible{outline:2px solid var(--star-gold); outline-offset:3px;}
+
+  h1,h2,h3{font-family:var(--display); margin:0; letter-spacing:0.2px;}
+
+  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+
+  /* ---------- Starfield background layer ---------- */
+  #stars{position:fixed; inset:0; z-index:-1; overflow:hidden;}
+  .twinkle{
+    position:absolute; border-radius:50%; background:var(--text);
+    opacity:0.6; animation:twinkle 3.2s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:0.15; transform:scale(0.8);}
+    50%{opacity:0.9; transform:scale(1.15);}
+  }
+
+  /* ---------- Hero ---------- */
+  header.hero{
+    position:relative;
+    padding:88px 0 64px;
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:13px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--lavender); margin-bottom:18px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:''; width:22px; height:1px; background:var(--lavender); display:inline-block;}
+
+  h1.title{
+    font-size:clamp(38px, 6vw, 64px);
+    font-weight:800;
+    color:var(--text);
+    line-height:1.05;
+  }
+  h1.title .accent{color:var(--star-gold);}
+
+  .subtitle{
+    max-width:56ch; margin-top:20px; font-size:18px; color:var(--muted);
+  }
+
+  .meta-row{
+    display:flex; flex-wrap:wrap; gap:12px; margin-top:32px;
+  }
+  .pill{
+    font-family:var(--mono); font-size:12.5px; padding:7px 14px; border-radius:999px;
+    border:1px solid var(--line); color:var(--muted); background:rgba(255,255,255,0.02);
+  }
+
+  /* ---------- Stage mockup (signature element) ---------- */
+  .stage-demo{
+    margin-top:56px;
+    position:relative;
+    width:100%;
+    max-width:560px;
+    aspect-ratio:4/3;
+    background:linear-gradient(180deg, #eef0ff 0%, #ffffff 100%);
+    border-radius:14px;
+    border:6px solid var(--bg-panel);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.55);
+    overflow:hidden;
+  }
+  .stage-demo::before{
+    content:'stage';
+    position:absolute; top:8px; left:12px;
+    font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.1em;
+    color:#b8bfe6;
+  }
+  .falling-star{
+    position:absolute; top:-40px; font-size:22px;
+    animation:fall linear infinite;
+  }
+  @keyframes fall{
+    to{ transform:translateY(420px); }
+  }
+  .catcher{
+    position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+    width:64px; height:40px;
+    animation:sway 2.6s ease-in-out infinite;
+  }
+  @keyframes sway{
+    0%,100%{ margin-left:-70px; }
+    50%{ margin-left:70px; }
+  }
+  .catcher svg{width:100%; height:100%; display:block;}
+  .score-chip{
+    position:absolute; top:8px; right:10px;
+    font-family:var(--mono); font-size:12px; font-weight:600;
+    color:#3a3f6b; background:rgba(255,203,71,0.35);
+    padding:4px 10px; border-radius:999px;
+  }
+
+  /* ---------- Sections ---------- */
+  main{padding:72px 0 40px;}
+  section{margin-bottom:88px;}
+  section > h2{
+    font-size:clamp(26px,3.4vw,34px);
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .section-lede{color:var(--muted); max-width:62ch; margin-bottom:36px; font-size:16px;}
+
+  /* Prep grid */
+  .prep-grid{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(210px,1fr)); gap:16px;
+  }
+  .prep-card{
+    border:1px solid var(--line); border-radius:12px; padding:20px;
+    background:rgba(255,255,255,0.02);
+  }
+  .prep-card .ico{font-size:22px;}
+  .prep-card h3{font-size:16px; margin:10px 0 6px; color:var(--text);}
+  .prep-card p{margin:0; font-size:14px; color:var(--muted);}
+
+  /* Steps */
+  .step{
+    display:grid; grid-template-columns:64px 1fr; gap:24px;
+    padding:36px 0; border-top:1px solid var(--line);
+  }
+  .step:last-child{border-bottom:1px solid var(--line);}
+  .step-num{
+    font-family:var(--display); font-weight:800; font-size:28px; color:var(--bg-deep);
+    background:var(--star-gold);
+    width:52px; height:52px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .step h3{font-size:21px; color:var(--text); margin-bottom:6px;}
+  .step .step-goal{color:var(--lavender); font-size:13.5px; font-family:var(--mono); margin-bottom:14px;}
+  .step p{margin:0 0 14px; color:#d7d5ef; font-size:15.5px;}
+  .step ul{margin:0 0 14px; padding-left:20px; color:#d7d5ef; font-size:15.5px;}
+  .step li{margin-bottom:6px;}
+
+  /* Scratch block chips */
+  .blocks{display:flex; flex-direction:column; gap:6px; margin:14px 0;}
+  .block-row{display:flex; flex-wrap:wrap; gap:6px;}
+  .block{
+    font-family:var(--mono); font-size:13px; color:#12163a;
+    padding:7px 12px; border-radius:8px; display:inline-block;
+    box-shadow:inset 0 -2px 0 rgba(0,0,0,0.15);
+  }
+  .block.events{background:#ffcb47;}
+  .block.motion{background:#7fd0ff;}
+  .block.control{background:#ffb173;}
+  .block.sensing{background:#7fe3d0;}
+  .block.variables{background:#ffa9c6;}
+  .block.looks{background:#c9a6ff;}
+  .block.sound{background:#a9c9ff;}
+  .block.operators{background:#a6e37f;}
+  .block-indent{margin-left:22px;}
+
+  .tip{
+    border-left:3px solid var(--star-gold);
+    background:rgba(255,203,71,0.06);
+    padding:12px 16px; border-radius:0 8px 8px 0;
+    font-size:14.5px; color:#e7e4ff;
+  }
+  .tip strong{color:var(--star-gold);}
+
+  /* Troubleshooting */
+  details{
+    border:1px solid var(--line); border-radius:10px; padding:14px 18px; margin-bottom:10px;
+    background:rgba(255,255,255,0.015);
+  }
+  summary{cursor:pointer; font-weight:600; font-size:15px; color:var(--text);}
+  details p{margin:10px 0 0; color:var(--muted); font-size:14.5px;}
+
+  /* Footer */
+  footer{
+    border-top:1px solid var(--line); padding:32px 0 48px;
+    color:var(--muted); font-size:13.5px;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  }
+  footer a{color:var(--muted); text-decoration:underline;}
+
+  @media (max-width:640px){
+    .step{grid-template-columns:44px 1fr; gap:16px;}
+    .step-num{width:40px; height:40px; font-size:20px; border-radius:11px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="stars" aria-hidden="true"></div>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Tutoriel Scratch · niveau débutant</p>
+    <h1 class="title">Attrape les <span class="accent">étoiles</span></h1>
+    <p class="subtitle">
+      Un mini-jeu où l'on déplace un personnage pour attraper des étoiles qui tombent du ciel.
+      Ce guide te fait construire le jeu bloc par bloc, du décor jusqu'au score.
+    </p>
+    <div class="meta-row">
+      <span class="pill">⏱ ~45 min</span>
+      <span class="pill">🧩 8 blocs Scratch de base</span>
+      <span class="pill">🎯 mouvement · variables · collisions</span>
+    </div>
+
+    <div class="stage-demo" aria-hidden="true">
+      <span class="score-chip">score : 7</span>
+      <span class="falling-star" style="left:18%; animation-duration:2.6s; animation-delay:0s;">⭐</span>
+      <span class="falling-star" style="left:52%; animation-duration:3.4s; animation-delay:0.8s;">⭐</span>
+      <span class="falling-star" style="left:78%; animation-duration:2.2s; animation-delay:1.6s;">⭐</span>
+      <div class="catcher">
+        <svg viewBox="0 0 64 40" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="32" cy="26" rx="26" ry="12" fill="#3a3f6b"/>
+          <circle cx="18" cy="12" r="8" fill="#3a3f6b"/>
+          <circle cx="46" cy="12" r="8" fill="#3a3f6b"/>
+          <circle cx="18" cy="12" r="3" fill="#ffcb47"/>
+          <circle cx="46" cy="12" r="3" fill="#ffcb47"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="preparation">
+    <h2>Avant de commencer</h2>
+    <p class="section-lede">Trois choses à avoir sous la main avant d'ouvrir l'éditeur.</p>
+    <div class="prep-grid">
+      <div class="prep-card">
+        <span class="ico">🌐</span>
+        <h3>L'éditeur Scratch</h3>
+        <p>Ouvre scratch.mit.edu → « Créer », dans un navigateur. Aucune installation n'est nécessaire.</p>
+      </div>
+      <div class="prep-card">
+        <span class="ico">🖼️</span>
+        <h3>Un décor de ciel nocturne</h3>
+        <p>Choisis-le dans la bibliothèque de décors intégrée (recherche « night » ou « space »).</p>
+      </div>
+      <div class="prep-card">
+        <span class="ico">🐱</span>
+        <h3>Deux lutins</h3>
+        <p>Un personnage qui attrape (celui par défaut convient) et un lutin « étoile » depuis la bibliothèque.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="etapes">
+    <h2>Les étapes</h2>
+    <p class="section-lede">Suis-les dans l'ordre : chaque étape ajoute une brique au comportement du jeu.</p>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <h3>Mettre en place la scène</h3>
+        <p class="step-goal">objectif : décor + personnages en place</p>
+        <p>Choisis un décor de nuit étoilée dans l'onglet « Décors ». Ajoute le lutin étoile et positionne-le
+          en haut de la scène. Place ton personnage-joueur en bas.</p>
+        <div class="tip"><strong>Astuce —</strong> renomme tes lutins « Joueur » et « Étoile » : ça évite de s'y perdre plus tard dans le code.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <h3>Déplacer le joueur avec les flèches</h3>
+        <p class="step-goal">objectif : mouvement gauche / droite</p>
+        <p>Sur le lutin « Joueur », assemble deux scripts :</p>
+        <div class="blocks">
+          <div class="block-row">
+            <span class="block events">quand touche « flèche gauche » pressée</span>
+          </div>
+          <div class="block-row block-indent">
+            <span class="block motion">changer x de -10</span>
+          </div>
+          <div class="block-row" style="margin-top:8px;">
+            <span class="block events">quand touche « flèche droite » pressée</span>
+          </div>
+          <div class="block-row block-indent">
+            <span class="block motion">changer x de 10</span>
+          </div>
+        </div>
+        <p>Clique sur le drapeau vert et teste : le personnage doit glisser de gauche à droite.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <h3>Faire tomber l'étoile</h3>
+        <p class="step-goal">objectif : chute en boucle depuis le haut de l'écran</p>
+        <p>Sur le lutin « Étoile » :</p>
+        <div class="blocks">
+          <div class="block-row"><span class="block events">quand le drapeau vert est cliqué</span></div>
+          <div class="block-row block-indent"><span class="block control">répéter indéfiniment</span></div>
+          <div class="block-row block-indent"><span class="block motion">changer y de -5</span></div>
+          <div class="block-row block-indent"><span class="block control">si &lt;position y &lt; -170&gt; alors</span></div>
+          <div class="block-row block-indent"><span class="block motion">aller à x : (nombre aléatoire -230 à 230) y : 170</span></div>
+        </div>
+        <p>La condition « si en bas de l'écran, on remonte » recrée l'étoile ailleurs en haut, à une position
+          horizontale tirée au hasard — c'est ce qui rend chaque chute différente.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div>
+        <h3>Créer la variable score</h3>
+        <p class="step-goal">objectif : compter les étoiles attrapées</p>
+        <ul>
+          <li>Onglet « Variables » → « Créer une variable » → nomme-la <code>score</code>, pour « tous les lutins ».</li>
+          <li>Coche-la pour l'afficher sur la scène.</li>
+        </ul>
+        <div class="blocks">
+          <div class="block-row"><span class="block events">quand le drapeau vert est cliqué</span></div>
+          <div class="block-row block-indent"><span class="block variables">mettre score à 0</span></div>
+        </div>
+        <p>Ajoute ce script sur le lutin « Joueur » : le score repart à zéro à chaque nouvelle partie.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div>
+        <h3>Détecter la collision</h3>
+        <p class="step-goal">objectif : +1 point quand l'étoile touche le joueur</p>
+        <p>Toujours sur le lutin « Étoile », dans la boucle « répéter indéfiniment », ajoute :</p>
+        <div class="blocks">
+          <div class="block-row block-indent"><span class="block sensing">si &lt;touche « Joueur » ?&gt; alors</span></div>
+          <div class="block-row block-indent"><span class="block variables">changer score de 1</span></div>
+          <div class="block-row block-indent"><span class="block motion">aller à x : (nombre aléatoire -230 à 230) y : 170</span></div>
+        </div>
+        <div class="tip"><strong>Astuce —</strong> place ce bloc « si » juste avant celui de l'étape 3 qui teste le bas de l'écran, pour que les deux conditions soient vérifiées à chaque tour de boucle.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div>
+        <h3>Ajouter du son (optionnel)</h3>
+        <p class="step-goal">objectif : un retour sonore à la capture</p>
+        <div class="blocks">
+          <div class="block-row block-indent"><span class="block sound">jouer le son « Pop » jusqu'à la fin</span></div>
+        </div>
+        <p>Insère ce bloc juste après « changer score de 1 » à l'étape 5. Choisis un son dans l'onglet « Sons » du lutin étoile au préalable.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">7</div>
+      <div>
+        <h3>Faire progresser la difficulté</h3>
+        <p class="step-goal">objectif : le jeu accélère avec le score</p>
+        <p>Remplace le <code>changer y de -5</code> de l'étape 3 par une vitesse liée au score :</p>
+        <div class="blocks">
+          <div class="block-row block-indent">
+            <span class="block motion">changer y de (-5 + <span class="block operators" style="padding:2px 6px; font-size:12px;">score / 5</span>)</span>
+          </div>
+        </div>
+        <p>Plus le score augmente, plus l'étoile tombe vite : la difficulté grandit toute seule.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">8</div>
+      <div>
+        <h3>Tester et ajuster</h3>
+        <p class="step-goal">objectif : un jeu agréable à jouer</p>
+        <ul>
+          <li>Le personnage se déplace-t-il assez vite ? Ajuste le <code>changer x de 10</code>.</li>
+          <li>Les étoiles tombent-elles trop vite au début ? Baisse la vitesse de départ.</li>
+          <li>Envie d'aller plus loin ? Ajoute un chronomètre de 60 secondes ou une deuxième étoile.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="depannage">
+    <h2>Ça ne marche pas ?</h2>
+    <p class="section-lede">Les blocages les plus fréquents, et comment les résoudre.</p>
+
+    <details>
+      <summary>Le score ne monte jamais</summary>
+      <p>Vérifie que le bloc « si touche Joueur » est bien à l'intérieur de la boucle « répéter indéfiniment »,
+        et que les deux lutins portent bien les noms utilisés dans les blocs « touche ... ? ».</p>
+    </details>
+    <details>
+      <summary>L'étoile traverse l'écran sans jamais remonter</summary>
+      <p>Le bloc « si position y &lt; -170 » doit lui aussi être dans la boucle. Sans lui, l'étoile continue
+        de descendre indéfiniment sous la scène.</p>
+    </details>
+    <details>
+      <summary>Le personnage ne bouge pas du tout</summary>
+      <p>Clique une première fois sur le drapeau vert : les scripts « quand touche flèche... pressée » ne
+        s'activent qu'après le lancement du programme.</p>
+    </details>
+    <details>
+      <summary>Toutes les étoiles tombent au même endroit</summary>
+      <p>Vérifie que tu utilises bien le bloc « nombre aléatoire » (onglet Opérateurs) et non un nombre fixe
+        dans le bloc « aller à x : ... y : 170 ».</p>
+    </details>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap" style="width:100%; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+    <span>Tutoriel écrit pour un usage pédagogique — libre de réutilisation.</span>
+    <span><a href="https://scratch.mit.edu" target="_blank" rel="noopener">Ouvrir Scratch ↗</a></span>
+  </div>
+</footer>
+
+<script>
+  // Ambient starfield
+  const field = document.getElementById('stars');
+  const N = 70;
+  for(let i=0;i<N;i++){
+    const s = document.createElement('div');
+    s.className = 'twinkle';
+    const size = Math.random()*2 + 1;
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDelay = (Math.random()*3.2)+'s';
+    s.style.animationDuration = (2.4 + Math.random()*2.4)+'s';
+    field.appendChild(s);
+  }
+</script>
+
+</body>
+</html>
