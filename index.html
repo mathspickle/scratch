@@ -246,6 +246,7 @@
 
     <div class="stage-demo" aria-hidden="true">
       <span class="score-chip">score : 7</span>
+      <span class="score-chip time-chip">temps : 12</span>
       <span class="falling-star" style="left:18%; animation-duration:2.6s; animation-delay:0s;">⭐</span>
       <span class="falling-star" style="left:52%; animation-duration:3.4s; animation-delay:0.8s;">⭐</span>
       <span class="falling-star" style="left:78%; animation-duration:2.2s; animation-delay:1.6s;">⭐</span>
@@ -280,8 +281,8 @@
       </div>
       <div class="prep-card">
         <span class="ico">🐱</span>
-        <h3>Deux lutins</h3>
-        <p>Un personnage qui attrape (celui par défaut convient) et un lutin « étoile » depuis la bibliothèque.</p>
+        <h3>Deux sprites</h3>
+        <p>Un personnage qui attrape (le "bowl" par exemple) et un sprite « étoile » depuis la bibliothèque.</p>
       </div>
     </div>
   </section>
@@ -295,9 +296,9 @@
       <div>
         <h3>Mettre en place la scène</h3>
         <p class="step-goal">objectif : décor + personnages en place</p>
-        <p>Choisis un décor de nuit étoilée dans l'onglet « Décors ». Ajoute le lutin étoile et positionne-le
+        <p>Choisis un décor de nuit étoilée dans l'onglet « Décors ». Ajoute le sprite étoile et positionne-le
           en haut de la scène. Place ton personnage-joueur en bas.</p>
-        <div class="tip"><strong>Astuce —</strong> renomme tes lutins « Joueur » et « Étoile » : ça évite de s'y perdre plus tard dans le code.</div>
+        <div class="tip"><strong>Astuce —</strong> renomme tes sprites « Joueur » et « Étoile » : ça évite de s'y perdre plus tard dans le code.</div>
       </div>
     </div>
 
@@ -306,19 +307,19 @@
       <div>
         <h3>Déplacer le joueur avec les flèches</h3>
         <p class="step-goal">objectif : mouvement gauche / droite</p>
-        <p>Sur le lutin « Joueur », assemble deux scripts :</p>
+        <p>Sur le sprite « Joueur », assemble deux scripts :</p>
         <div class="blocks">
           <div class="block-row">
             <span class="block events">quand touche « flèche gauche » pressée</span>
           </div>
           <div class="block-row block-indent">
-            <span class="block motion">changer x de -10</span>
+            <span class="block motion">ajouter -15 à x</span>
           </div>
           <div class="block-row" style="margin-top:8px;">
             <span class="block events">quand touche « flèche droite » pressée</span>
           </div>
           <div class="block-row block-indent">
-            <span class="block motion">changer x de 10</span>
+            <span class="block motion">ajouter 15 à x</span>
           </div>
         </div>
         <p>Clique sur le drapeau vert et teste : le personnage doit glisser de gauche à droite.</p>
@@ -330,11 +331,11 @@
       <div>
         <h3>Faire tomber l'étoile</h3>
         <p class="step-goal">objectif : chute en boucle depuis le haut de l'écran</p>
-        <p>Sur le lutin « Étoile » :</p>
+        <p>Sur le sprite « Étoile » :</p>
         <div class="blocks">
           <div class="block-row"><span class="block events">quand le drapeau vert est cliqué</span></div>
           <div class="block-row block-indent"><span class="block control">répéter indéfiniment</span></div>
-          <div class="block-row block-indent"><span class="block motion">changer y de -5</span></div>
+          <div class="block-row block-indent"><span class="block motion">ajouter -5 à y</span></div>
           <div class="block-row block-indent"><span class="block control">si &lt;position y &lt; -170&gt; alors</span></div>
           <div class="block-row block-indent"><span class="block motion">aller à x : (nombre aléatoire -230 à 230) y : 170</span></div>
         </div>
@@ -349,23 +350,45 @@
         <h3>Créer la variable score</h3>
         <p class="step-goal">objectif : compter les étoiles attrapées</p>
         <ul>
-          <li>Onglet « Variables » → « Créer une variable » → nomme-la <code>score</code>, pour « tous les lutins ».</li>
+          <li>Onglet « Variables » → « Créer une variable » → nomme-la <code>score</code>, pour « tous les sprites ».</li>
           <li>Coche-la pour l'afficher sur la scène.</li>
         </ul>
         <div class="blocks">
           <div class="block-row"><span class="block events">quand le drapeau vert est cliqué</span></div>
           <div class="block-row block-indent"><span class="block variables">mettre score à 0</span></div>
         </div>
-        <p>Ajoute ce script sur le lutin « Joueur » : le score repart à zéro à chaque nouvelle partie.</p>
+        <p>Ajoute ce script sur le sprite « Joueur » : le score repart à zéro à chaque nouvelle partie.</p>
+      </div>
+    </div>
+
+    <div class="step" id="chrono">
+      <div class="step-num">5</div>
+      <div>
+        <h3>Ajouter un chronomètre (30 secondes)</h3>
+        <p class="step-goal">objectif : limiter chaque partie à 30 secondes</p>
+        <ul>
+          <li>Onglet « Variables » → « Créer une variable » → nomme-la <code>temps</code>, pour « tous les lutins ».</li>
+          <li>Coche-la pour l'afficher sur la scène, à côté du score.</li>
+        </ul>
+        <p>Sur le sprite « Joueur », ajoute ce script pour lancer le compte à rebours au démarrage :</p>
+        <div class="blocks">
+          <div class="block-row"><span class="block events">quand le drapeau vert est cliqué</span></div>
+          <div class="block-row block-indent"><span class="block variables">mettre temps à 30</span></div>
+          <div class="block-row block-indent"><span class="block control">répéter jusqu'à &lt;temps = 0&gt;</span></div>
+          <div class="block-row block-indent block-indent"><span class="block control">attendre 1 seconde</span></div>
+          <div class="block-row block-indent block-indent"><span class="block variables">changer temps de -1</span></div>
+          <div class="block-row block-indent"><span class="block sound">arrêter tout</span></div>
+        </div>
+        <div class="tip"><strong>Astuce —</strong> le bloc « arrêter tout » (onglet Contrôle) coupe la chute des étoiles et le déplacement du joueur dès que le temps atteint 0 : c'est la fin de partie.</div>
       </div>
     </div>
 
     <div class="step">
-      <div class="step-num">5</div>
+      <div class="step-num">6</div>
       <div>
         <h3>Détecter la collision</h3>
         <p class="step-goal">objectif : +1 point quand l'étoile touche le joueur</p>
-        <p>Toujours sur le lutin « Étoile », dans la boucle « répéter indéfiniment », ajoute :</p>
+        <p>Toujours sur le sprite « Étoile », dans la boucle « répéter indéfiniment », ajoute :</p>
         <div class="blocks">
           <div class="block-row block-indent"><span class="block sensing">si &lt;touche « Joueur » ?&gt; alors</span></div>
           <div class="block-row block-indent"><span class="block variables">changer score de 1</span></div>
@@ -376,34 +399,7 @@
     </div>
 
     <div class="step">
-      <div class="step-num">6</div>
-      <div>
-        <h3>Ajouter du son (optionnel)</h3>
-        <p class="step-goal">objectif : un retour sonore à la capture</p>
-        <div class="blocks">
-          <div class="block-row block-indent"><span class="block sound">jouer le son « Pop » jusqu'à la fin</span></div>
-        </div>
-        <p>Insère ce bloc juste après « changer score de 1 » à l'étape 5. Choisis un son dans l'onglet « Sons » du lutin étoile au préalable.</p>
-      </div>
-    </div>
-
-    <div class="step">
       <div class="step-num">7</div>
-      <div>
-        <h3>Faire progresser la difficulté</h3>
-        <p class="step-goal">objectif : le jeu accélère avec le score</p>
-        <p>Remplace le <code>changer y de -5</code> de l'étape 3 par une vitesse liée au score :</p>
-        <div class="blocks">
-          <div class="block-row block-indent">
-            <span class="block motion">changer y de (-5 + <span class="block operators" style="padding:2px 6px; font-size:12px;">score / 5</span>)</span>
-          </div>
-        </div>
-        <p>Plus le score augmente, plus l'étoile tombe vite : la difficulté grandit toute seule.</p>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">8</div>
       <div>
         <h3>Tester et ajuster</h3>
         <p class="step-goal">objectif : un jeu agréable à jouer</p>
@@ -423,7 +419,7 @@
     <details>
       <summary>Le score ne monte jamais</summary>
       <p>Vérifie que le bloc « si touche Joueur » est bien à l'intérieur de la boucle « répéter indéfiniment »,
-        et que les deux lutins portent bien les noms utilisés dans les blocs « touche ... ? ».</p>
+        et que les deux sprites portent bien les noms utilisés dans les blocs « touche ... ? ».</p>
     </details>
     <details>
       <summary>L'étoile traverse l'écran sans jamais remonter</summary>
