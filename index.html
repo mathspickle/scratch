@@ -131,11 +131,19 @@
     50%{ margin-left:70px; }
   }
   .catcher svg{width:100%; height:100%; display:block;}
+  .hud{
+    position:absolute; top:8px; left:8px; right:8px;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:8px; pointer-events:none;
+  }
   .score-chip{
-    position:absolute; top:8px; right:10px;
     font-family:var(--mono); font-size:12px; font-weight:600;
     color:#3a3f6b; background:rgba(255,203,71,0.35);
     padding:4px 10px; border-radius:999px;
+    white-space:nowrap;
+  }
+  .time-chip{
+    color:#7a3a5a; background:rgba(255,111,156,0.28);
   }
 
   /* ---------- Sections ---------- */
@@ -245,8 +253,10 @@
     </div>
 
         <div class="stage-demo" aria-hidden="true">
+           <div class="hud">
       <span class="score-chip">score : 7</span>
       <span class="score-chip time-chip">temps : 12</span>
+            </div>
       <span class="falling-star" style="left:18%; animation-duration:2.6s; animation-delay:0s;">⭐</span>
       <span class="falling-star" style="left:52%; animation-duration:3.4s; animation-delay:0.8s;">⭐</span>
       <span class="falling-star" style="left:78%; animation-duration:2.2s; animation-delay:1.6s;">⭐</span>
